@@ -1,0 +1,6 @@
+node_modules
+vars.env
+.devops
+bitbucket-pipelines.yml
+.env.vars
+.env.sample

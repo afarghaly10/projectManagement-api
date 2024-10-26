@@ -1,0 +1,1411 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: Upsiide API
+consumes:
+  - application/json
+parameters:
+  Authorization:
+    in: header
+    name: Authorization
+    description: Active user JWT - passed through as 'Bearer token'
+    type: string
+    required: true
+  clientUuid:
+    in: header
+    name: x-client-uuid
+    description: Active client UUID
+    type: string
+    required: true
+  accountUuid:
+    in: header
+    name: x-account-uuid
+    description: Active Account UUID (optional - will default to first account user is attached to)
+    type: string
+    required: false
+produces:
+  - application/json
+
+paths:
+
+# complex objects have schema definitions
+definitions:
+  Answer:
+    required:
+      - questionId
+      - respondentId
+    properties:
+      id:
+        type: integer
+        example: 52
+      questionId:
+        type: integer
+        example: 4
+      respondentId:
+        type: integer
+        example: 31
+      value:
+        type: string
+        example: "I like it because it is awesome."
+        description: Either value or optionId must be set on any given answer.
+      optionId:
+        type: integer
+        example: 53
+        description: Either value or optionId must be set on any given answer.
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+      htmlErrorCode:
+        type: integer
+        example: 404
+      status:
+        type: string
+        example: error
+
+  Category:
+    type: object
+    required:
+    - id
+    - name
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 4
+      name:
+        type: string
+        example: Alcohol
+
+  LanguageWithCountries:
+    required:
+    - id
+    - label
+    - languageCode
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 2
+      label:
+        type: string
+        example: English
+      languageCode:
+        type: string
+        example:  en
+      countries:
+        type: array
+        items:
+          type: object
+          properties:
+            label:
+              type: string
+              example: Canada
+            id:
+              type: integer
+              example: 1
+  Language:
+    required:
+    - label
+    - languageCode
+    properties:
+      label:
+        type: string
+        example: English
+      languageCode:
+        type: string
+        example:  en
+  Country:
+    required:
+    - label
+    - languageCode
+    properties:
+      id:
+        type: integer
+        example: 1
+      label:
+        type: string
+        example:  Canada
+  CountryLanguage:
+    required:
+    - label
+    - languageCode
+    properties:
+      id:
+        type: integer
+        example: 1
+      label:
+        type: string
+        example:  English
+      code:
+        type: string
+        example: en
+  ProductUpdateBody:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        example: Logitech M185 wireless mouse
+      layout:
+        type: string
+        example: one-field
+      defaultLanguageCode:
+        type: string
+        example: en_CA
+      categories:
+        type: array
+        items:
+          type: number
+      tags:
+        type: array
+        items:
+          type: number
+      translations:
+        type: array
+        items:
+          $ref: '#/definitions/ProductTranslation'
+
+  ProductPatchBody:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        example: Logitech M185 wireless mouse
+      tags:
+        type: array
+        example: [3, 56, 89]
+        items:
+          type: number
+      translations:
+        type: array
+        items:
+          $ref: '#/definitions/PatchProductTranslation'
+
+  ProductListObject:
+    type: object
+    required:
+      - id
+      - name
+      - language
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 5
+      name:
+        type: string
+        example: Logitech M185 wireless mouse
+      clientId:
+        type: number
+      layout:
+        type: string
+        enum: [one-field, two-field, classic]
+      categories:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: number
+            label:
+              type: string
+            taxonomyLabel:
+              type: string
+      tags:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: number
+            label:
+              type: string
+            taxonomyLabel:
+              type: string
+
+  ProductTranslation:
+    type: object
+    properties:
+      languageCode:
+        type: string
+        example: en_CA
+      isDefaultLanguageCode:
+        type: boolean
+        description: Set on only one translation where languageCode == study.defaultLanguageCode
+      description:
+        type: string
+      title:
+        type: string
+      subtitle:
+        type: string
+      price:
+        type: string
+      fieldOne:
+        type: string
+      fieldOneType:
+        type: string
+        enum: ['html', 'asset']
+      fieldOneOptions:
+        type: object
+      fieldTwo:
+        type: string
+      fieldTwoType:
+        type: string
+        enum: ['html', 'asset']
+      fieldTwoOptions:
+        type: object
+      fieldThree:
+        type: string
+      fieldThreeType:
+        type: string
+        enum: ['html', 'asset']
+      fieldThreeOptions:
+        type: object
+  PatchProductTranslation:
+    type: object
+    properties:
+      languageCode:
+        type: string
+        example: en_CA
+      fieldOne:
+        type: string
+      fieldOneType:
+        type: string
+        enum: ['html', 'asset']
+      fieldOneOptions:
+        type: object
+      fieldTwo:
+        type: string
+      fieldTwoType:
+        type: string
+        enum: ['html', 'asset']
+      fieldTwoOptions:
+        type: object
+      fieldThree:
+        type: string
+      fieldThreeType:
+        type: string
+        enum: ['html', 'asset']
+      fieldThreeOptions:
+        type: object
+      description:
+        type: string
+      title:
+        type: string
+      subtitle:
+        type: string
+      price:
+        type: string
+  BulkProduct:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        example: Logitech M185 wireless mouse
+      fieldOne:
+        type: array
+        items:
+          type: number
+      fieldTwo:
+        type: array
+        items:
+          type: number
+      fieldThree:
+        type: array
+        items:
+          type: number
+  ProductCreateBody:
+    type: object
+    required:
+      - id
+      - name
+      - language
+    properties:
+      name:
+        type: string
+        example: Logitech M185 wireless mouse
+      layout:
+        type: string
+        example: one-field
+      defaultLanguageCode:
+        type: string
+        example: en_CA
+      categories:
+        type: array
+        items:
+          type: number
+      sectionId:
+        type: number
+        example: 216
+        description: An optional id that is passed in to automatically attach this product to a section
+      tags:
+        type: array
+        items:
+          type: number
+      translations:
+        type: array
+        items:
+          $ref: '#/definitions/ProductTranslation'
+
+  AssetResponse:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 16
+      location:
+        type: string
+        example: https://testbucket.s3.amazon.com/test.png
+      fileKey:
+        type: string
+      url:
+        type: string
+        example: https://testbucket.s3.amazon.com/test.png?sign=xqwe
+
+  ProductAsset:
+    type: object
+    required:
+      - id
+      - productID
+      - type
+      - asset
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 16
+      productID:
+        type: integer
+        format: int32
+        example: 5
+      type:
+        type: string
+        example: audio|video|image
+        default: image
+      asset:
+        type: string
+        example: image.png
+
+  ProductType:
+    type: object
+    required:
+    - name
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 2
+      name:
+        type: string
+        example: In-Market
+
+  Qualification:
+    properties:
+      id:
+        type: integer
+        example: 1
+      qualificationId:
+        type: integer
+        example: 43
+      type:
+        type: string
+        example: single-select
+      class:
+        type: string
+        example: gender
+      label:
+        type: string
+        example: Are you..?
+      options:
+        type: array
+        items:
+          $ref: '#/definitions/QualificationOption'
+  QualificationOption:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 1
+      providerQuestionId:
+        type: integer
+        example: 1
+      qualificationOptionId:
+        type: integer
+        example: 1
+      quota:
+        type: integer
+        description: The default census rep for this option
+        example: 20
+      label:
+        type: string
+        example: Male / Un Homme
+  QualifierOption:
+    type: object
+    properties:
+      name:
+        type: string
+        description: a string integer representing the lucid qualifier id
+        example: "42"
+      value:
+        type: string
+        description: a string integer representing the value for a qualifier
+        example: "27"
+  Question:
+    type: object
+    properties:
+      studyId:
+        type: integer
+        format: int32
+        example: 1
+      type:
+        type: string
+        example: age
+      style:
+        type: string
+        example: scale
+      label:
+        type: string
+        example: How old are you?
+      isFilter:
+        type: boolean
+        example: true
+      filterLabel:
+        type: string
+        example: "Age"
+        description: An optional override for the dashboard filter
+      translations:
+        type: array
+        items:
+          $ref: '#/definitions/QuestionTranslation'
+      options:
+        type: array
+        items:
+          $ref: '#/definitions/QuestionOption'
+      attributes:
+        type: array
+        items:
+          $ref: '#/definitions/QuestionAttribute'
+      settings:
+        type: array
+        items:
+          $ref: '#/definitions/QuestionSettings'
+  QuestionOption:
+    type: object
+    required:
+    - languageCode
+    - label
+    - value
+    properties:
+      id:
+        type: integer
+        example: 23
+      order:
+        type: string
+        example: 1
+      lockOrder:
+        type: boolean
+        example: true
+      isOtherSpecify:
+        type: boolean
+        example: true
+      isNoneOfTheAbove:
+        type: boolean
+        example: true
+        description: To be used if the value is selected by default.
+      assetId:
+        type: integer
+        example: 77
+      translations:
+        type: array
+        items:
+          type: object
+          properties:
+            languageCode:
+              type: string
+              example: en_CA
+              description: The language of this option
+            label:
+              type: string
+              example: Twenty
+            id:
+              type: string
+              example: 23
+              description: If not present, it will create new translations
+            assetId:
+              type: integer
+              example: 10
+  QuestionTranslation:
+    type: object
+    required:
+    - label
+    - languageCode
+    properties:
+      id:
+        type: integer
+        example: 33
+      label:
+        type: string
+        example: "En Francais!"
+      languageCode:
+        type: string
+        example: fr_FR
+        description: The language of this translation
+      assetId:
+        type: integer
+        example: 14
+        description: An optional image/asset ID
+  QuestionAttribute:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 23
+        description: not required with create or patch
+      order:
+        type: integer
+        format: int32
+        example: 1
+      lockOrder:
+        type: boolean
+        example: true
+      assetId:
+        type: integer
+        format: int32
+        example: 1
+      translations:
+        type: array
+        items:
+          $ref: '#/definitions/QuestionAttributeTranslation'
+  QuestionAttributeTranslation:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 23
+        description: not required with create or patch
+      label:
+        type: string
+        example: "String"
+      languageCode:
+        type: string
+        example: "en"
+        description: Either studyTranslationId or LanaguageCode REQUIRED
+      studyTranslationId:
+        type: integer
+        format: int32
+        example: 1
+        description: Either studyTranslationId or LanaguageCode REQUIRED
+      assetId:
+        type: integer
+        format: int32
+        example: 1
+  QuestionSettings:
+    type: object
+    required:
+    - label
+    properties:
+      id:
+        type: integer
+        example: 33
+      label:
+        type: string
+        example: "Max"
+      type:
+        type: string
+        example: "integer"
+        description: "The datatype of the value"
+      value:
+        type: string
+        example: "14"
+  StudyTranslation:
+    type: object
+    required:
+    - introText
+    - languageCode
+    properties:
+      introText:
+        type: string
+        example: "J'adore Upsiide 2.0"
+      languageCode:
+        type: string
+        example: "fr_FR"
+  Logic:
+    type: object
+    required:
+    - actionType
+    - actionSectionId
+    - triggerType
+    - triggerSectionId
+    - sectionId
+    - operand
+    - operator
+    properties:
+      actionType:
+        type: string
+        example: "No enum"
+      actionSectionId:
+        type: string
+        example: "No enum"
+      actionItemId:
+        type: number
+        example: 45
+      triggerType:
+        type: string
+        example: "No enum"
+      triggerItemId:
+        type: number
+        example: 64
+      triggerOptions:
+        type: array
+        items:
+          type: number
+      triggerSectionId:
+        type: number
+        example: 33
+      sectionId:
+        type: number
+        example: 55
+      sectionItemId:
+        type: number
+        example: 63
+      operator:
+        type: string
+        example: "No enum"
+      operand:
+        type: string
+        example: "No enum"
+  PatchLogic:
+    type: object
+    required:
+    - actionType
+    - actionSectionId
+    - triggerType
+    - triggerSectionId
+    - sectionId
+    - operand
+    - operator
+    properties:
+      id:
+        integer: string
+        example: 32
+      actionType:
+        type: string
+        example: "No enum"
+      actionSectionId:
+        type: string
+        example: "No enum"
+      actionItemId:
+        type: number
+        example: 45
+      triggerType:
+        type: string
+        example: "No enum"
+      triggerItemId:
+        type: number
+        example: 64
+      triggerOptions:
+        type: array
+        items:
+          type: number
+      triggerSectionId:
+        type: number
+        example: 33
+      sectionId:
+        type: number
+        example: 55
+      sectionItemId:
+        type: number
+        example: 63
+      operator:
+        type: string
+        example: "No enum"
+      operand:
+        type: string
+        example: "No enum"
+  Section:
+    type: object
+    required:
+    - name
+    - type
+    properties:
+      name:
+        type: string
+        example: "Swipe Exercise 1"
+      type:
+        type: string
+        example: "swipe"
+        enum: [swipe, statement, questions]
+      translatedAt:
+        type: string
+        example: "null OR date"
+      uuid:
+        type: string
+        example: "dslkfhdslkj-dfsdfjsfs-fdsfjhdsjkh"
+      order:
+        type: integer
+        example: 1
+
+  StudyCategory:
+    type: object
+    properties:
+      taxonomyLabel:
+        type: string
+        example: 'StudyCategory'
+      label:
+        type: string
+        example: "Beverage"
+      id:
+        type: integer
+        example: 1
+
+  StudyListObject:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 1
+      name:
+        description: Name of the study
+        type: string
+        example: Weston Flatbreads
+      status:
+        description: Status of the study
+        type: string
+        example: Draft
+      base:
+        description: Study Base
+        type: number
+      categories:
+        type: array
+        items:
+          $ref: '#/definitions/StudyCategory'
+      languages:
+        type: array
+        items:
+          type: string
+      asset:
+        type: string
+        description: URL
+      createdAt:
+        type: string
+        description: ISO String Date. Time of creating study.
+  StudyCreateBody:
+    type: object
+    required:
+      - name
+      - defaultLanguage
+      - settings
+    properties:
+      name:
+        description: Name of the study
+        type: string
+        example: Weston Flatbreads
+      defaultLanguage:
+        type: string
+        description: The language that will be used for this study if not specified otherwise by the end user.
+        example: en_CA
+      translations:
+        type: array
+        description: An array of translation object including the default translation.
+        items:
+          $ref: '#/definitions/StudyTranslation'
+      categories:
+        type: array
+        items:
+          type: number
+          description: ID of term.
+          example: 1
+      geographyIds:
+        type: array
+        items:
+          type: number
+          description: ID of term.
+          example: 1
+      description:
+        type: string
+        description: The description of this study (Does not support translations)
+      asset:
+        type: number
+        description: ID of asset
+      settings:
+        $ref: '#/definitions/StudySetting'
+
+  Study:
+    type: object
+    required:
+    - name
+    - defaultLanguage
+    - settings
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 1
+      name:
+        description: Name of the study
+        type: string
+        example: Weston Flatbreads
+      defaultLanguage:
+        type: string
+        description: The language that will be used for this study if not specified otherwise by the end user.
+        example: en-CA
+      translations:
+        type: array
+        description: An array of translation object including the default translation.
+        items:
+          $ref: '#/definitions/StudyTranslation'
+      asset:
+        type: number
+        description: ID of asset
+      studyCategories:
+        type: array
+        description: A list of category IDs to relate this study to.
+        items:
+          type: integer
+          format: int32
+          example: 1
+      settings:
+        $ref: '#/definitions/StudySetting'
+
+  StudyResponse:
+    type: object
+    properties:
+      id:
+        description: The study ID
+        type: integer
+      name:
+        type: string
+        example: Weston Flatbreads
+      base:
+        type: number
+        example: StudyBase
+      status:
+        type: string
+        example: published
+        description: The status of the study
+      asset:
+        type: string
+        description: The signed image url for the study thumbnail.
+  StudyDetailedResponse:
+    type: object
+    required:
+      - id
+      - name
+      - language
+      - settings
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 1
+      name:
+        type: string
+        example: Weston Flatbreads
+      accountId:
+        type: number
+        example: 1
+      uuid:
+        type: string
+        example: 825cb70f-374b-4f59-99aa-4c94dabf7147
+      description:
+        type: string
+      status:
+        type: string
+      asset:
+        type: string
+        example: https://s3.url/image.jpeg
+        description: A signed S3 url of the asset uploaded for this study.
+      assetId:
+        type: integer
+        example: 43
+        description: The id of the asset for the signed url
+      base:
+        type: number
+        example: StudyBase
+      introText:
+        type: string
+        description: The translated intro/description text of this study.
+      categories:
+        type: array
+        description: The list of categories this study is related to.
+        items:
+          $ref: '#/definitions/StudyCategory'
+      settings:
+        $ref: '#/definitions/StudySetting'
+  StudyEditResponse:
+    type: object
+    required:
+      - id
+      - name
+      - language
+      - settings
+    properties:
+      id:
+        type: integer
+        format: int32
+        example: 1
+      name:
+        type: string
+        example: Weston Flatbreads
+      uuid:
+        type: string
+        example: 825cb70f-374b-4f59-99aa-4c94dabf7147
+      accountId:
+        type: number
+        example: 1
+      description:
+        type: string
+      status:
+        type: string
+      base:
+        type: number
+        example: StudyBase
+      languages:
+        type: array
+        description: array of codes used in translations
+        items:
+          type: string
+          example: en-CA
+      translations:
+        type: array
+        items:
+          $ref: '#/definitions/StudyTranslation'
+      asset:
+        type: string
+        example: https://s3.url/image.jpeg
+        description: A signed S3 url of the asset uploaded for this study.
+      introText:
+        type: string
+        description: The translated intro/description text of this study.
+      categories:
+        type: array
+        description: The list of categories this study is related to.
+        items:
+          $ref: '#/definitions/StudyCategory'
+      settings:
+        $ref: '#/definitions/StudySetting'
+
+  insertedItem:
+    type: object
+    properties:
+      fieldCount:
+        type: integer
+        example: 0
+      affectedRows:
+        type: integer
+        example: 1
+      insertId:
+        type: integer
+        example: 103
+      info:
+        type: string
+      serverStatus:
+        type: integer
+        example: 2
+      warningStatus:
+        type: integer
+        example: 0
+  deletedAtItem:
+    type: object
+    properties:
+      fieldCount:
+        type: integer
+        default: 0
+      affectedRows:
+        type: integer
+        default: 0
+        example: 1
+      insertId:
+        type: integer
+        default: 0
+      info:
+        type: string
+        example: "Rows matched: 1  Changed: 1  Warnings: 0"
+      serverStatus:
+        type: integer
+        example: 2
+      warningStatus:
+        type: integer
+        example: 0
+      changedRows:
+        type: integer
+        example: 1
+
+  Interest:
+    type: object
+    required:
+      - productId
+      - interest
+      - considered
+    example:
+      productId: 1
+      interest: true
+      considered: false
+    properties:
+      productId:
+        type: integer
+      interest:
+        type: boolean
+      considered:
+        type: boolean
+
+  Respondent:
+    type: object
+    example:
+      token: 'ab8124c771f787e8778f7ff7'
+      url: 'http://some-url.com'
+      country: 'usa'
+      language: 'en'
+    properties:
+      token:
+        type: string
+      url:
+        type: string
+      country:
+        type: string
+      language:
+        type: string
+  SectionSetting:
+    properties:
+      label:
+        type: string
+      value:
+        type: string
+      type:
+        type: string
+      languageCode:
+        type: string
+  Response:
+    type: object
+    required:
+      - language
+      - productOrder
+      - device
+      - rid
+      - studyId
+    example:
+      studyId: 1
+      rid: 'slfjnsd-1d1d1-dasdasd-1dsadc'
+      language: 'en'
+      productOrder: [15,2,5]
+      device: 'mobile'
+    properties:
+      studyId:
+        type: string
+      rid:
+        description: Respondent Token
+        type: string
+      respondentId:
+        description: This field will be in responses
+        type: number
+      language:
+        type: string
+      productOrder:
+        type: array
+        items:
+          type: number
+      device:
+        type: string
+
+  ResponseUpdate:
+    type: object
+    properties:
+      winningProductId:
+        type: number
+        description: An optional field for the winning products ID,
+      interests:
+        type: array
+        items:
+          type: object
+          properties:
+            timeOnScreen:
+              type: string
+            productId:
+              type: number
+            interest:
+              type: boolean
+            considered:
+              type: boolean
+            sectionId:
+              type: number
+      commitments:
+        type: array
+        items:
+          type: object
+          properties:
+            timeOnScreen:
+              type: string
+            productIdWon:
+              type: number
+            productIdLost:
+              type: number
+            sectionId:
+              type: number
+      questions:
+        type: array
+        items:
+          type: object
+          properties:
+            questionId:
+              type: number
+            optionId:
+              type: number
+            value:
+              type: string
+            sectionId:
+              type: number
+      sentimentText:
+        type: array
+        items:
+          type: object
+          properties:
+            productId:
+              type: number
+            assetVariationId:
+              type: number
+            message:
+              type: string
+            sectionId:
+              type: number
+      sentimentTags:
+        type: array
+        items:
+          type: object
+          properties:
+            productId:
+              type: number
+            assetVariationId:
+              type: number
+            x:
+              type: string
+            y:
+              type: string
+            emoji:
+              type: string
+            sectionId:
+              type: number
+    
+    ResponseTerminate:
+      type: object
+      properties:
+        questions:
+          type: array
+          items:
+            type: object
+            properties:
+              questionId:
+                type: number
+              optionId:
+                type: number
+              value:
+                type: string
+        qualifiers:
+          type: array
+          items:
+              $ref: QualifierOption
+            
+  AudienceNorm:
+    type: object
+    properties:
+      studyId: 
+        type: integer
+      sectionId:
+        type: integer
+      audienceUid:
+        type: string
+      audienceName:
+        type: string
+      min:
+        type: integer
+      max:
+        type: integer  
+
+  Commitment:
+    type: object
+    required:
+      - productIdWon
+      - productIdLost
+    example:
+      productIdWon: 1
+      productIdLost: 2
+    properties:
+      productIdWon:
+        type: integer
+      productIdLost:
+        type: integer
+  ChatCompletion:
+    type: array
+    items:
+      type: string
+      description: generated by AI text based on prompt
+  AudienceReport:
+    type: object
+    properties:
+      advancedTargets:
+        type: array
+        items:
+          type: object
+          properties:
+            questionId: 
+              type: integer
+              description: the id from the AudienceProviderQuestion table
+            base:
+              type: integer
+            invalids:
+              type: integer
+            isOpenEnded:
+              type: boolean
+            label:
+              type: string
+            filterLabel:
+              type: string
+            values:
+              type: array
+              description: "all open ended values answered to this target"
+              example: "for age: [42, 58, 12]"
+              items:
+                type: integer
+            options:
+              type: array
+              items:
+                type: object
+                properties:
+                  providerQuestionId:
+                    type: integer
+                    description: the id from the AudienceProviderQuestion table
+                  providerQuestionOptionId:
+                    type: integer
+                  label:
+                    type: string
+                  base:
+                    type: integer
+      customTargets:
+        type: array
+        items:
+          type: object
+          properties:
+            questionId:
+              type: integer
+            label:
+              type: string
+            filterLabel:
+              type: string
+            base:
+              type: integer
+              description: total number of respondents who answered this question.
+            invalids:
+              type: integer
+              description: total number of respondents who were disqualified on this question.
+            options:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: optionId
+                  base:
+                    type: integer
+                    description: total number of respondents who answered this question
+                  label:
+                    type: string
+                  languageCode:
+                    type: string
+                    example: "en"
+                  questionId:
+                    type: integer
+                  value:
+                    type: string
+                    description: text value (if other specify)
+                  isNoneOfTheAbove:
+                    type: boolean
+                  isOtherSpecify:
+                    type: boolean
+            attributes:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: attributeId
+                  base:
+                    type: integer
+                    description: total number of respondents who selected this attribute
+                  label:
+                    type: string
+                  languageCode:
+                    type: string
+                  questionId:
+                    type: integer
+  
+  ReportStats:
+    type: object
+    additionalProperties:
+      type: object
+      properties: 
+        base:
+          type: integer
+          description: number of responses with this answer
+        invalids:
+          type: integer
+          description: number of disqualifications by this answer
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              optionId:
+                type: integer
+                description: optionId
+              base:
+                type: integer
+                description: number of responses with this option
+              invalids:
+                type: integer
+                description: number of disqualifications by this option
+        attributes:
+          type: array
+          items:
+            type: object
+            properties:
+              attributeId:
+                type: integer
+                description: attributeId
+              optionId:
+                type: integer
+                description: optionId
+              base:
+                type: integer
+                description: number of responses with this attribute + option combination
+              invalids:
+                type: integer
+                description: number of disqualifications by this attribute + option combination
+
+
+
+# Added by API Auto Mocking Plugin
+# host: development.dz2y8rdvbc.ca-central-1.elasticbeanstalk.com
+# during dev, should point to your local machine
+host: localhost:2600
+
+# basePath prefixes all resource paths
+basePath: /
+
+# remove http to make production-grade
+schemes:
+  # - https
+  - http
