@@ -10,14 +10,20 @@ const project = {
 		);
 	},
 	get: async (projectId, id) => {
-		const [dbItem] = await db.run(
-			db
-				.select()
-				.fields('*')
-				.from(TABLE)
-				.where({id, deletedAt: null, projectId})
-		);
-		return dbItem;
+		const [[task], attachments, comments] = await Promise.all([
+			db.run(
+				db.select().fields('*').from(TABLE).where({id, deletedAt: null, projectId})
+			),
+			db.run(
+				db.select().fields('*').from('Attachments').where({taskId: id, deletedAt: null})
+			),
+			db.run(
+				db.select().fields('*').from('Comments').where({taskId: id, deletedAt: null})
+			),
+		]);
+
+		const response ={...task, attachments: [...attachments], comments: [...comments]};
+		return response;
 	},
 	create: async (createData) => {
 		return (await db.run(db.insert().into(TABLE).values(createData))).insertId;
@@ -38,6 +44,23 @@ const project = {
 	},
 
 	delete: async (projectId, id) => {
+		await Promise.all([
+			db.run(
+				db
+					.update()
+					.table('Attachments')
+					.set({deletedAt: db.expr.now()})
+					.where({taskId: id, deletedAt: null})
+			),
+			db.run(
+				db
+					.update()
+					.table('Comments')
+					.set({deletedAt: db.expr.now()})
+					.where({taskId: id, deletedAt: null})
+			),
+		]);
+
 		return await db.run(
 			db
 				.update()
