@@ -6,7 +6,7 @@ module.exports = {
 		'  `status` varchar(64) NULL DEFAULT NULL,\n' +
 		'  `description` varchar(512) DEFAULT NULL,\n' +
 		'  `startDate` DATETIME NULL DEFAULT NULL,' +
-		'  `endDate` DATETIME NULL DEFAULT NULL,' +
+		'  `dueDate` DATETIME NULL DEFAULT NULL,' +
 		'  `createdAt` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,' +
 		'  `updatedAt` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,' +
 		'  `deletedAt` TIMESTAMP NULL DEFAULT NULL,' +

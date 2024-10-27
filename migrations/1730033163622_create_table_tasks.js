@@ -5,6 +5,7 @@ module.exports = {
 		'  `projectId` int(11) NOT NULL,\n' +
 		'  `authorUserId` int(11) NOT NULL,\n' +
 		'  `assignedUserId` int(11) DEFAULT NULL,\n' +
+		'  `title` varchar(215) COLLATE utf8_unicode_ci DEFAULT NULL,\n' +
 		'  `description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,\n' +
 		'  `status` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,\n' +
 		'  `priority` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,\n' +

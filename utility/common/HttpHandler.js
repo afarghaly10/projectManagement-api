@@ -1,7 +1,7 @@
 // const mysql = require('mysql2');
 const db = require('./database');
 
-const AccessKey = require('../api/AccessKey/model');
+// const AccessKey = require('../api/AccessKey/model');
 
 module.exports = {
 	response: (res, err, rows) => {
@@ -16,12 +16,12 @@ module.exports = {
 	},
 	log: async (req) => {
 		try {
-			let userId = '';
+			const userId = '';
 			if (req.headers.authorization) {
-				const token = req.headers.authorization.replace('Bearer ', '');
-				const validJwt = await AccessKey.revalidateJwt(token);
-				const jwt = await AccessKey.decodeJwt(validJwt.minifiedKey);
-				userId = jwt.user && jwt.user.uuid ? jwt.user.uuid : '';
+				// const token = req.headers.authorization.replace('Bearer ', '');
+				// const validJwt = await AccessKey.revalidateJwt(token);
+				// const jwt = await AccessKey.decodeJwt(validJwt.minifiedKey);
+				// userId = jwt.user && jwt.user.uuid ? jwt.user.uuid : '';
 			}
 
 			const endpoint = req.originalUrl;

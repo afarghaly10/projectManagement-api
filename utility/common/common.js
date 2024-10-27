@@ -5,9 +5,8 @@ const ValidationError = require('./errors/ValidationError');
 const FailedDependencyError = require('./errors/FailedDependencyError');
 const NotFoundError = require('./errors/NotFoundError');
 const AuthorizationError = require('./errors/AuthorizationError');
-const auth = require('../middleware/auth');
 const ConflictError = require('./errors/ConflictError');
-const StorageService = require('./storage');
+// const StorageService = require('./storage');
 const GenericNotFoundError = require('./errors/GenericNotFoundError');
 
 module.exports = {
@@ -17,8 +16,7 @@ module.exports = {
 	FailedDependencyError,
 	NotFoundError,
 	AuthorizationError,
-	auth,
 	ConflictError,
-	StorageService,
+	// StorageService,
 	GenericNotFoundError,
 };

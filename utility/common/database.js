@@ -74,9 +74,9 @@ expr.like = (a, b) => new Expression(`${a.toString()} LIKE ${b.toString()}`);
 expr.notLike = (a, b) => new Expression(`${a.toString()} NOT LIKE ${b.toString()}`);
 expr.and = (...args) =>
 	new Expression(
-		args.length > 1
-			? `(${args.map((a) => a.toString()).join(' AND ')})`
-			: args.map((a) => a.toString()).join(' AND ')
+		args.length > 1 ?
+			`(${args.map((a) => a.toString()).join(' AND ')})` :
+			args.map((a) => a.toString()).join(' AND ')
 	);
 expr.or = (...args) =>
 	new Expression(
@@ -153,23 +153,23 @@ specialConditionValues.push((key, value) =>
 
 /* NOT LIKE */
 specialConditionValues.push((key, value) =>
-	isObject(value) && '$not' in value && isObject(value['$not']) && '$like' in value['$not']
-		? expr.notLike(expr.id(key), expr.valueOrExpression(value['$not']['$like']))
-		: false
+	isObject(value) && '$not' in value && isObject(value['$not']) && '$like' in value['$not'] ?
+		expr.notLike(expr.id(key), expr.valueOrExpression(value['$not']['$like'])) :
+		false
 );
 
 /* IN */
 specialConditionValues.push((key, value) =>
-	isObject(value) && '$in' in value
-		? expr.in(expr.id(key), value['$in'].map((item) => expr.valueOrExpression(item)))
-		: false
+	isObject(value) && '$in' in value ?
+		expr.in(expr.id(key), value['$in'].map((item) => expr.valueOrExpression(item))) :
+		false
 );
 
 /* NOT IN */
 specialConditionValues.push((key, value) =>
-	isObject(value) && '$not' in value && isObject(value['$not']) && '$in' in value['$not']
-		? expr.notIn(expr.id(key), value['$not']['$in'].map((item) => expr.valueOrExpression(item)))
-		: false
+	isObject(value) && '$not' in value && isObject(value['$not']) && '$in' in value['$not'] ?
+		expr.notIn(expr.id(key), value['$not']['$in'].map((item) => expr.valueOrExpression(item))) :
+		false
 );
 
 /**
@@ -182,9 +182,9 @@ operators.all = () => '*';
 
 /* A helper to Select a specific field */
 const field = (config) =>
-	Array.isArray(config)
-		? `${expr(config[0]).toString()} AS ${expr.id(config[1]).toString()}`
-		: expr(config).toString();
+	Array.isArray(config) ?
+		`${expr(config[0]).toString()} AS ${expr.id(config[1]).toString()}` :
+		expr(config).toString();
 
 /* Select specific fields like $.fields('name', 'age'), supports expressions */
 operators.fields = (...config) => config.map((fieldConfig) => field(fieldConfig)).join(', ');

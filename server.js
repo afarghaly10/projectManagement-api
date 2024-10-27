@@ -1,4 +1,4 @@
-if (process.env.NODE_ENV !== 'local' && process.env.ENABLE_DATADOG === 'true') {
+if (process.env.NODE_ENV !== 'local') {
 	const tracer = require('dd-trace');
 	tracer.init({
 		env: process.env.NODE_ENV,
@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== 'local' && process.env.ENABLE_DATADOG === 'true') {
 
 const app = require('./app');
 
-const port = process.env.PORT || 2600;
+const port = process.env.PORT || 2500;
 
 const enforceSsl = process.env.ENFORCE_SSL || 'false';
 
@@ -21,8 +21,8 @@ if (enforceSsl === 'false') {
 	const https = require('https');
 	const fs = require('fs');
 
-	console.log(`Using SSL on port ${port}.`
-	+ `\n Host - ${process.env.DB_HOST} \n Name - ${process.env.DB_NAME}`);
+	console.log(`Using SSL on port ${port}.` +
+	`\n Host - ${process.env.DB_HOST} \n Name - ${process.env.DB_NAME}`);
 
 	/**
 	 * To generate ssl cert for local (tested on macos)

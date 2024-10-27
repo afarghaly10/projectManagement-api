@@ -1,6 +1,6 @@
 require('dotenv').config();
 const _ = require('lodash');
-const { GenericNotFoundError } = require('./common/common');
+const {GenericNotFoundError} = require('./common/common');
 const errorHandler = {
 	log: (exception) => {
 		console.error(exception);
@@ -47,8 +47,9 @@ const errorHandler = {
 				if (req.body.password) req.body.password = '******';
 			}
 
-			if (req.headers && req.headers.authorization)
+			if (req.headers && req.headers.authorization) {
 				req.headers.authorization = '******';
+			}
 		}
 		res.status(error.htmlErrorCode).json(error);
 	},
