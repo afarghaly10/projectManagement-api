@@ -6,9 +6,11 @@ const service = {
 	list: async () => {
 		return await model.list();
 	},
+	get: async (id) => {
+		return await model.get(id);
+	},
 	create: async (createData) => {
-		const insertId = await model.create(createData);
-		return await model.get(insertId);
+		return await model.create(createData);
 	},
 };
 

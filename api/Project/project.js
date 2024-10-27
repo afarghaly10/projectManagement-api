@@ -13,16 +13,17 @@ const project = {
 		);
 	},
 	get: async (id) => {
-		return await db.run(
+		const [dbItem] = await db.run(
 			db
 				.select()
 				.fields('*')
 				.from(TABLE)
 				.where({id, deletedAt: null})
 		);
+		return dbItem;
 	},
 	create: async (createData) => {
-		return (await db.run(db.select().insert().into(TABLE).values(createData))).insertId;
+		return (await db.run(db.insert().into(TABLE).values(createData))).insertId;
 	},
 
 };

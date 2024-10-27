@@ -3,7 +3,6 @@ const app = express();
 const bodyParser = require('body-parser');
 const compression = require('compression');
 const helmet = require('helmet');
-const {AuthenticationError} = require('./utility/common/common');
 const errorHandler = require('./utility/errorHandler');
 const passport = require('passport');
 const _ = require('lodash');
@@ -37,31 +36,6 @@ if (!['production', 'beta'].includes(process.env.NODE_ENV)) {
 
 // Enable CORS
 app.use(express.static(path.join(__dirname, 'public')));
-// app.use(
-// 	cors({
-// 		origin: (origin, callback) => {
-// 			// If we're on a test server or a domain is not provided
-// 			if (process.env.NODE_ENV === 'test' || origin === undefined) {
-// 				callback(null, true);
-// 				return;
-// 			}
-
-// 			if (
-// 				whitelist.some((rx) => {
-// 					const regex = RegExp(rx);
-// 					return regex.test(origin);
-// 				})
-// 			) {
-// 				callback(null, true);
-// 			} else {
-// 				console.info(`Domain: ${origin} is blocked by cors`);
-// 				console.info(whitelist);
-// 				callback(new AuthenticationError('Domain blocked by CORS', origin));
-// 			}
-// 		},
-// 	}),
-// 	errorHandler.renderSamlError
-// );
 
 app.use((req, res, next) => {
 	if (process.env.DISABLE_API === 'true') {
@@ -90,9 +64,11 @@ app.use(bodyParser.json({verify: rawBodySaver}));
 
 // Require routes.
 const projectRoutes = require('./api/Project/routes');
+const taskRoutes = require('./api/Project/Task/routes');
 
 // Use routes.
-app.use('/projects', projectRoutes);
+app.use(projectRoutes);
+app.use(taskRoutes);
 
 
 // catch 404 and forward to error handler

@@ -1,5 +1,5 @@
 'use strict';
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 const ValidationError = require('./errors/ValidationError');
 /**
  * @class JoiValidatorHelper
@@ -26,7 +26,7 @@ class JoiValidatorHelper {
  * @param {*} schema
  */
 function _errorJoiHandler(input, message, schema) {
-	const {error} = Joi.validate(input, schema);
+	const {error} = schema.validate(input);
 	if (error) {
 		throw new ValidationError(message, error.message);
 	}
