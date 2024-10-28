@@ -65,10 +65,14 @@ app.use(bodyParser.json({verify: rawBodySaver}));
 // Require routes.
 const projectRoutes = require('./api/Project/routes');
 const taskRoutes = require('./api/Project/Task/routes');
+const userRoutes = require('./api/User/routes');
+const teamsRoutes = require('./api/Team/routes');
 
 // Use routes.
 app.use(projectRoutes);
 app.use(taskRoutes);
+app.use(userRoutes);
+app.use(teamsRoutes);
 
 
 // catch 404 and forward to error handler
