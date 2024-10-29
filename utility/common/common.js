@@ -8,6 +8,7 @@ const AuthorizationError = require('./errors/AuthorizationError');
 const ConflictError = require('./errors/ConflictError');
 // const StorageService = require('./storage');
 const GenericNotFoundError = require('./errors/GenericNotFoundError');
+const hashMapHelper = require('./hashMapHelpers');
 
 module.exports = {
 	db,
@@ -17,6 +18,7 @@ module.exports = {
 	NotFoundError,
 	AuthorizationError,
 	ConflictError,
+	hashMapHelper,
 	// StorageService,
 	GenericNotFoundError,
 };

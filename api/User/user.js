@@ -51,5 +51,14 @@ const model = {
 		);
 		return user;
 	},
+	getMultipleUsers: async (ids) => {
+		return await db.run(
+			db
+				.select()
+				.fields('*')
+				.from(TABLE)
+				.where({id: {$in: ids}, deletedAt: null})
+		);
+	},
 };
 module.exports = model;

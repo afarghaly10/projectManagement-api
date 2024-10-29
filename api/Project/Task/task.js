@@ -1,9 +1,8 @@
 'use strict';
-const {update} = require('lodash');
 const {db} = require('../../../utility/common/common');
 
 const TABLE = 'Tasks';
-const project = {
+const task = {
 	list: async (projectId) => {
 		return await db.run(
 			db.select().fields('*').from(TABLE).where({deletedAt: null, projectId})
@@ -75,4 +74,4 @@ const project = {
 	},
 };
 
-module.exports = project;
+module.exports = task;
